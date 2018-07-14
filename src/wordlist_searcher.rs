@@ -5,28 +5,13 @@ use std::path::Path;
 
 use Search;
 
-pub struct WordlistSearcher {
-    search_term: String,
-}
+pub struct WordlistSearcher; 
 
 impl Search for WordlistSearcher {
 
-    fn new(search_term: String) -> Self {
-        Self {
-            search_term: search_term,
-        }
-    }
-
-    fn search(&self) -> Vec<String> {
+    fn search() -> Vec<String> {
         let path = env!("CARGO_MANIFEST_DIR").to_string() + "/src/words_alpha.txt";
-        let word_list = lines_from_file(path);
-        let mut candidates = Vec::new();
-        for word in &word_list {
-            if word.contains(self.search_term.as_str()) {
-                candidates.push(word.to_string());
-            }
-        }
-        candidates
+        lines_from_file(path)
     }
 
 }
@@ -47,11 +32,7 @@ mod tests {
 
     #[test]
     fn basic_search() {
-        let searcher = WordlistSearcher::new("sss".to_string());
-        assert_eq!(searcher.search(), ["asssembler", "bossship", "demigoddessship",
-                                       "earlesss", "goddessship", "headmistressship",
-                                       "passsaging", "patronessship"]);
+        assert_eq!(WordlistSearcher::search().len(), 370099);
     }
 
 }
-

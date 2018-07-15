@@ -1,3 +1,4 @@
+pub mod files_searcher;
 pub mod wordlist_searcher;
 
 pub trait Search {

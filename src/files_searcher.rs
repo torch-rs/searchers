@@ -36,7 +36,8 @@ mod tests {
 
     #[test]
     fn simple_search() {
-        let actual_candidates = ["lib.rs", "files_searcher.rs", "words_alpha.txt", "wordlist_searcher.rs"];
+        let actual_candidates = ["lib.rs", "files_searcher.rs", "words_alpha.txt",
+                                 "app_searcher.rs", "wordlist_searcher.rs"];
         let candidates = FilesSearcher::search();
         for i in 0..candidates.len() {
             println!("{}", candidates[i]);

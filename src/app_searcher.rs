@@ -12,9 +12,10 @@ pub struct AppSearcher;
 fn get_directory_content(root_path: String) -> Vec<String> {
     let mut dir_contents = Vec::new();
     for entry in WalkDir::new(root_path).contents_first(true).into_iter().filter_map(|e| e.ok()) {
-        if entry.file_type().is_dir() {
-            continue;
-        }
+        if (cfg!(target_os="macos") && !entry.path().to_string_lossy().into_owned().ends_with(".app")) ||
+            (!cfg!(target_os="macos") && entry.file_type().is_dir()) {
+                continue;
+            }
         dir_contents.push(entry.path().to_string_lossy().into_owned());
     }
     dir_contents
@@ -55,7 +56,31 @@ fn search_linux() -> Vec<String> {
 }
 
 fn search_macos() -> Vec<String> {
-    vec![]
+    let homedir = match dirs::home_dir() {
+        Some(path) => path.to_string_lossy().into_owned(),
+        None => String::from("")
+    };
+    let user_app_directory = String::from(format!("{}/Applications", homedir));
+    let main_root_app_directory = String::from("/Applications");
+
+    let mut candidates: HashSet<String> = HashSet::new();
+
+    if Path::new(&user_app_directory).exists() {
+        for candidate in get_directory_content(user_app_directory) {
+            candidates.insert(candidate);
+        }
+    }
+    if Path::new(&main_root_app_directory).exists() {
+        for candidate in get_directory_content(main_root_app_directory) {
+            candidates.insert(candidate);
+        }
+    }
+
+    let mut candidates_vec = Vec::new();
+    for candidate in candidates {
+        candidates_vec.push(candidate);
+    }
+    candidates_vec
 }
 
 fn search_windows() -> Vec<String> {

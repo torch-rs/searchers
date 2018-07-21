@@ -38,7 +38,7 @@ mod tests {
     #[test]
     fn simple_search() {
         let root_path = format!("{}/src", env!("CARGO_MANIFEST_DIR"));
-        let actual_candidates = ["lib.rs", "files_searcher.rs", "words_alpha.txt",
+        let actual_candidates = ["windows_searcher.rs", "lib.rs", "files_searcher.rs", "words_alpha.txt",
                                  "app_searcher.rs", "wordlist_searcher.rs"];
         let candidates = search_directory(root_path);
         for i in 0..candidates.len() {

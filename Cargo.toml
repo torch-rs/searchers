@@ -6,4 +6,5 @@ authors = ["Patrick Chan <patrickchan1999@gmail.com>"]
 [dependencies]
 dirs = "1.0"
 raise_window = { git = "https://github.com/torch-rs/raise_window" }
+search_candidate = { git = "https://github.com/torch-rs/search_candidate" }
 walkdir = "2"

@@ -1,6 +1,8 @@
-extern crate walkdir;
 extern crate dirs;
+extern crate search_candidate;
+extern crate walkdir;
 
+use self::search_candidate::SearchCandidate;
 use self::walkdir::WalkDir;
 
 use Search;
@@ -20,12 +22,16 @@ fn search_directory(root_directory: String) -> Vec<String> {
 
 impl Search for FilesSearcher {
 
-    fn search() -> Vec<String> {
+    fn search() -> Vec<SearchCandidate> {
         let root_path = match dirs::home_dir() {
             Some(path) => path.to_string_lossy().into_owned(),
             None => String::from("")
         };
-        search_directory(root_path)
+        let mut result = Vec::new();
+        for entry in &search_directory(root_path) {
+            result.push(SearchCandidate::new(entry.clone(), entry.clone(), String::from("")));
+        }
+        result
     }
     
 }

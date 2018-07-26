@@ -1,3 +1,6 @@
+extern crate search_candidate;
+
+use self::search_candidate::SearchCandidate;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::fs::File;
@@ -9,9 +12,13 @@ pub struct WordlistSearcher;
 
 impl Search for WordlistSearcher {
 
-    fn search() -> Vec<String> {
+    fn search() -> Vec<SearchCandidate> {
         let path = env!("CARGO_MANIFEST_DIR").to_string() + "/src/words_alpha.txt";
-        lines_from_file(path)
+        let mut result = Vec::new();
+        for line in &lines_from_file(path) {
+            result.push(SearchCandidate::new(line.clone(), line.clone(), String::from("")));
+        }
+        result
     }
 
 }

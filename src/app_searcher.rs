@@ -1,6 +1,8 @@
-extern crate walkdir;
 extern crate dirs;
+extern crate search_candidate;
+extern crate walkdir;
 
+use self::search_candidate::SearchCandidate;
 use self::walkdir::WalkDir;
 use std::collections::HashSet;
 use std::path::Path;
@@ -21,7 +23,7 @@ fn get_directory_content(root_path: String) -> Vec<String> {
     dir_contents
 }
 
-fn search_linux() -> Vec<String> {
+fn search_linux() -> Vec<SearchCandidate> {
     let homedir = match dirs::home_dir() {
         Some(path) => path.to_string_lossy().into_owned(),
         None => String::from("")
@@ -50,12 +52,12 @@ fn search_linux() -> Vec<String> {
 
     let mut candidates_vec = Vec::new();
     for candidate in candidates {
-        candidates_vec.push(candidate);
+        candidates_vec.push(SearchCandidate::new(candidate.clone(), candidate.clone(), String::from("")));
     }
     candidates_vec
 }
 
-fn search_macos() -> Vec<String> {
+fn search_macos() -> Vec<SearchCandidate> {
     let homedir = match dirs::home_dir() {
         Some(path) => path.to_string_lossy().into_owned(),
         None => String::from("")
@@ -78,18 +80,18 @@ fn search_macos() -> Vec<String> {
 
     let mut candidates_vec = Vec::new();
     for candidate in candidates {
-        candidates_vec.push(candidate);
+        candidates_vec.push(SearchCandidate::new(candidate.clone(), candidate.clone(), String::from("")));
     }
     candidates_vec
 }
 
-fn search_windows() -> Vec<String> {
+fn search_windows() -> Vec<SearchCandidate> {
     vec![]
 }
 
 impl Search for AppSearcher {
 
-    fn search() -> Vec<String> {
+    fn search() -> Vec<SearchCandidate> {
         if cfg!(target_os="linux") {
             return search_linux();
         } else if cfg!(target_os="macos") {
@@ -112,7 +114,7 @@ mod tests {
     #[test]
     fn verify_found_all_apps() {
         let candidates = AppSearcher::search();
-        assert_eq!(candidates.len(), 94);
+        assert_eq!(candidates.len(), 99);
     }
 
 }

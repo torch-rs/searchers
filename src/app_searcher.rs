@@ -1,7 +1,9 @@
 extern crate dirs;
+extern crate inflector;
 extern crate search_candidate;
 extern crate walkdir;
 
+use self::inflector::Inflector;
 use self::search_candidate::SearchCandidate;
 use self::walkdir::WalkDir;
 use std::collections::HashSet;
@@ -52,7 +54,7 @@ fn search_linux() -> Vec<SearchCandidate> {
 
     let mut candidates_vec = Vec::new();
     for candidate in candidates {
-        candidates_vec.push(SearchCandidate::new(candidate.clone(), candidate.clone(), String::from("")));
+        candidates_vec.push(SearchCandidate::new(candidate.clone(), candidate.clone().to_title_case(), String::new()));
     }
     candidates_vec
 }
@@ -80,7 +82,7 @@ fn search_macos() -> Vec<SearchCandidate> {
 
     let mut candidates_vec = Vec::new();
     for candidate in candidates {
-        candidates_vec.push(SearchCandidate::new(candidate.clone(), candidate.clone(), String::from("")));
+        candidates_vec.push(SearchCandidate::new(candidate.clone(), candidate.clone().to_title_case(), String::new()));
     }
     candidates_vec
 }

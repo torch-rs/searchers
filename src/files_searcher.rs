@@ -33,7 +33,7 @@ impl Search for FilesSearcher {
             let file_ext = Path::new(&entry).extension();
             let mut icon_path = String::new();
             if let Some(file_ext) = file_ext {
-                icon_path = format!(".fiv-viv .fiv-icon-{}", file_ext.to_string_lossy().into_owned());
+                icon_path = format!("fiv-viv fiv-icon-{}", file_ext.to_string_lossy().into_owned());
             }
             result.push(SearchCandidate::new(entry.clone(), entry.clone(), icon_path));
         }

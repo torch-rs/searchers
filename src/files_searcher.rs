@@ -4,6 +4,7 @@ extern crate walkdir;
 
 use self::search_candidate::SearchCandidate;
 use self::walkdir::WalkDir;
+use std::path::Path;
 
 use Search;
 
@@ -29,7 +30,12 @@ impl Search for FilesSearcher {
         };
         let mut result = Vec::new();
         for entry in &search_directory(root_path) {
-            result.push(SearchCandidate::new(entry.clone(), entry.clone(), String::from("")));
+            let file_ext = Path::new(&entry).extension();
+            let mut icon_path = String::new();
+            if let Some(file_ext) = file_ext {
+                icon_path = format!(".fiv-viv .fiv-icon-{}", file_ext.to_string_lossy().into_owned());
+            }
+            result.push(SearchCandidate::new(entry.clone(), entry.clone(), icon_path));
         }
         result
     }

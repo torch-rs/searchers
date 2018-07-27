@@ -54,7 +54,12 @@ fn search_linux() -> Vec<SearchCandidate> {
 
     let mut candidates_vec = Vec::new();
     for candidate in candidates {
-        candidates_vec.push(SearchCandidate::new(candidate.clone(), candidate.clone().to_title_case(), String::new()));
+        let path = Path::new(&candidate);
+        if let Some(filename) = path.file_stem() {
+            candidates_vec.push(SearchCandidate::new(candidate.clone(),
+                                                     filename.to_string_lossy().into_owned().to_title_case(),
+                                                     String::new()));
+        }
     }
     candidates_vec
 }

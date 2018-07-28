@@ -38,6 +38,34 @@ fn get_line_from_file(filename: &str, line_prefix: &str) -> Option<String> {
     }
 }
 
+fn get_icon_dir(icon_root_dir: &str) -> Option<String> {
+    let size_dir = vec!["512x512", "64x64", "48x48", "32x32", "24x24", "16x16"];
+    for size in &size_dir {
+        let test_icon_dir = format!("{}/{}/apps", icon_root_dir, size);
+        if Path::new(&test_icon_dir).exists() {
+            return Some(test_icon_dir.clone());
+        }
+    }
+    None
+}
+
+fn try_get_icon_path(root_icon_dir: &str, icon: &str) -> Result<String, ()> {
+    if let Some(icon_dir) = get_icon_dir(root_icon_dir) {
+        let test_png_icon_path = format!("{}/{}.png", icon_dir, icon);
+        let test_svg_icon_path = format!("{}/{}.svg", icon_dir, icon);
+        if icon.contains("/") {
+            return Ok(icon.to_string());
+        } else if Path::new(&test_png_icon_path).exists() {
+            return Ok(test_png_icon_path.clone());
+        } else if Path::new(&test_svg_icon_path).exists() {
+            return Ok(test_svg_icon_path.clone());
+        } else {
+            return Err(());
+        }
+    }
+    return Err(());
+}
+
 fn get_icon_path_from_desktop_file(desktop_filename: String) -> String {
     let homedir = match dirs::home_dir() {
         Some(path) => path.to_string_lossy().into_owned(),
@@ -56,26 +84,14 @@ fn get_icon_path_from_desktop_file(desktop_filename: String) -> String {
         }
     }
     if let Some(line) = get_line_from_file(&format!("{}/.gtkrc-2.0", homedir), "gtk-icon-theme-name=\"") {
-        let mut icon_dir = String::new();
         let root_icon_path = format!("/usr/share/icons/{}", line[line.find("\"").unwrap()+1..line.len()-1].to_string());
-        let size_dir = vec!["512x512", "64x64", "48x48", "32x32", "24x24", "16x16"];
-        for size in &size_dir {
-            let test_icon_dir = format!("{}/{}/apps", root_icon_path, size);
-            if Path::new(&test_icon_dir).exists() {
-                icon_dir = test_icon_dir.clone();
-                break;
-            }
+        match try_get_icon_path(&root_icon_path, &icon) {
+            Ok(icon_path) => return icon_path,
+            Err(_err) => {},
         }
-        let test_png_icon_path = format!("{}/{}.png", icon_dir, icon);
-        let test_svg_icon_path = format!("{}/{}.svg", icon_dir, icon);
-        if icon.contains("/") {
-            return icon;
-        } else if Path::new(&test_png_icon_path).exists() {
-            return test_png_icon_path.clone();
-        } else if Path::new(&test_svg_icon_path).exists() {
-            return test_svg_icon_path.clone();
-        } else {
-            return String::new();
+        match try_get_icon_path("/usr/share/icons/hicolor", &icon) {
+            Ok(icon_path) => return icon_path,
+            Err(_err) => return String::new(),
         }
     }
     String::new()
@@ -161,36 +177,36 @@ fn search_macos() -> Vec<SearchCandidate> {
     candidates_vec
 }
 
-    fn search_windows() -> Vec<SearchCandidate> {
-        vec![]
-    }
+fn search_windows() -> Vec<SearchCandidate> {
+    vec![]
+}
 
-    impl Search for AppSearcher {
+impl Search for AppSearcher {
 
-        fn search() -> Vec<SearchCandidate> {
-            if cfg!(target_os="linux") {
-                return search_linux();
-            } else if cfg!(target_os="macos") {
-                return search_macos();
-            } else if cfg!(target_os="windows") {
-                return search_windows();
-            } else {
-                return Vec::new();
-            }
+    fn search() -> Vec<SearchCandidate> {
+        if cfg!(target_os="linux") {
+            return search_linux();
+        } else if cfg!(target_os="macos") {
+            return search_macos();
+        } else if cfg!(target_os="windows") {
+            return search_windows();
+        } else {
+            return Vec::new();
         }
-
     }
 
-    #[cfg(test)]
-    mod tests {
+}
 
-        use Search;
-        use app_searcher::AppSearcher;
+#[cfg(test)]
+mod tests {
 
-        #[test]
-        fn verify_found_all_apps() {
-            let candidates = AppSearcher::search();
-            assert_eq!(candidates.len(), 94);
-        }
+    use Search;
+    use app_searcher::AppSearcher;
 
+    #[test]
+    fn verify_found_all_apps() {
+        let candidates = AppSearcher::search();
+        assert_eq!(candidates.len(), 94);
     }
+
+}

@@ -2,11 +2,10 @@ extern crate dirs;
 extern crate search_candidate;
 extern crate walkdir;
 
+use Search;
 use self::search_candidate::SearchCandidate;
 use self::walkdir::WalkDir;
 use std::path::Path;
-
-use Search;
 
 pub struct FilesSearcher;
 

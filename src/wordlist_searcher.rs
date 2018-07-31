@@ -1,12 +1,11 @@
 extern crate search_candidate;
 
+use Search;
 use self::search_candidate::SearchCandidate;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::fs::File;
 use std::path::Path;
-
-use Search;
 
 pub struct WordlistSearcher; 
 

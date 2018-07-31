@@ -200,8 +200,8 @@ impl Search for AppSearcher {
 #[cfg(test)]
 mod tests {
 
-    use Search;
     use app_searcher::AppSearcher;
+    use Search;
 
     #[test]
     fn verify_found_all_apps() {

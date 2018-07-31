@@ -66,13 +66,13 @@ fn try_get_icon_path(root_icon_dir: &str, icon: &str) -> Result<String, ()> {
     return Err(());
 }
 
-fn get_icon_path_from_desktop_file(desktop_filename: String) -> String {
+fn get_icon_path_from_desktop_file(desktop_filename: &str) -> String {
     let homedir = match dirs::home_dir() {
         Some(path) => path.to_string_lossy().into_owned(),
         None => String::from("")
     };
     let mut icon = String::new();
-    if let Some(line) = get_line_from_file(&desktop_filename, "Icon=") {
+    if let Some(line) = get_line_from_file(desktop_filename, "Icon=") {
         icon = line[line.find("=").unwrap()+1..].to_string();
         let png_pixmaps_path = format!("/usr/share/pixmaps/{}.png", icon);
         let svg_pixmaps_path = format!("/usr/share/pixmaps/{}.svg", icon);
@@ -97,7 +97,7 @@ fn get_icon_path_from_desktop_file(desktop_filename: String) -> String {
     String::new()
 }
 
-fn get_directory_content(root_path: String) -> Vec<String> {
+fn get_directory_content(root_path: &str) -> Vec<String> {
     let mut dir_contents = Vec::new();
     for entry in WalkDir::new(root_path).contents_first(true).into_iter().filter_map(|e| e.ok()) {
         if (cfg!(target_os="macos") && !entry.path().to_string_lossy().into_owned().ends_with(".app")) ||
@@ -114,9 +114,9 @@ fn search_linux() -> Vec<SearchCandidate> {
         Some(path) => path.to_string_lossy().into_owned(),
         None => String::from("")
     };
-    let user_app_directory = String::from(format!("{}/.local/share/applications", homedir));
-    let main_root_app_directory = String::from("/usr/share/applications");
-    let secondary_root_app_directory = String::from("/usr/local/share/applications");
+    let user_app_directory = &format!("{}/.local/share/applications", homedir);
+    let main_root_app_directory = "/usr/share/applications";
+    let secondary_root_app_directory = "/usr/local/share/applications";
 
     let mut candidates: HashSet<String> = HashSet::new();
 
@@ -140,10 +140,10 @@ fn search_linux() -> Vec<SearchCandidate> {
     for candidate in candidates {
         let path = Path::new(&candidate);
         if let Some(filename) = path.file_stem() {
-            let icon_path = get_icon_path_from_desktop_file(candidate.clone());
-            candidates_vec.push(SearchCandidate::new(filename.clone().to_string_lossy().into_owned(),
-                                                     filename.clone().to_string_lossy().into_owned().to_title_case(),
-                                                     icon_path.clone()));
+            let icon_path = get_icon_path_from_desktop_file(&candidate);
+            candidates_vec.push(SearchCandidate::new(filename.to_string_lossy().into_owned(),
+                                                     filename.to_string_lossy().into_owned().to_title_case(),
+                                                     icon_path));
         }
     }
     candidates_vec
@@ -154,8 +154,8 @@ fn search_macos() -> Vec<SearchCandidate> {
         Some(path) => path.to_string_lossy().into_owned(),
         None => String::from("")
     };
-    let user_app_directory = String::from(format!("{}/Applications", homedir));
-    let main_root_app_directory = String::from("/Applications");
+    let user_app_directory = &format!("{}/Applications", homedir);
+    let main_root_app_directory = "/Applications";
 
     let mut candidates: HashSet<String> = HashSet::new();
 
